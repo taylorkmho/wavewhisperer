@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { FaEllipsis, FaGithub, FaPause, FaPlay } from "react-icons/fa6";
 import { toast } from "sonner";
 import { useAudio } from "../AudioContext";
+import { VoteButtons } from "../VoteButtons";
 import { WaveHeights } from "./WaveHeights";
 
 interface BottomNavProps {
@@ -13,6 +14,7 @@ interface BottomNavProps {
   waveHeights: WaveHeight[];
   onClickDropdown: () => void;
   audioFile?: string;
+  surfReportId: string;
 }
 
 const formatTimeStamp = (timeInSeconds: number) => {
@@ -26,6 +28,7 @@ export function BottomNav({
   waveHeights,
   onClickDropdown,
   audioFile,
+  surfReportId,
 }: BottomNavProps) {
   const { isPlaying, play, pause, audioRef } = useAudio();
   const [audioProgress, setAudioProgress] = useState(0);
@@ -124,13 +127,16 @@ export function BottomNav({
           <WaveHeights waveHeights={waveHeights} />
         </div>
       </div>
-      <Link
-        href="https://github.com/taylorkmho/wavwhisperer"
-        target="_blank"
-        className="group shrink-0 rounded-full border-2 border-transparent p-1 hover:border-fuchsia-400/20 hover:bg-gradient-to-br hover:from-fuchsia-400/30 hover:to-indigo-400/30"
-      >
-        <FaGithub className="size-4 transition-transform group-hover:scale-125" />
-      </Link>
+      <div className="flex items-center gap-2">
+        <VoteButtons surfReportId={surfReportId} />
+        <Link
+          href="https://github.com/taylorkmho/wavwhisperer"
+          target="_blank"
+          className="group shrink-0 rounded-full border-2 border-transparent p-1 hover:border-fuchsia-400/20 hover:bg-gradient-to-br hover:from-fuchsia-400/30 hover:to-indigo-400/30"
+        >
+          <FaGithub className="size-4 transition-transform group-hover:scale-125" />
+        </Link>
+      </div>
       <button
         onClick={onClickDropdown}
         className="inline-flex h-full shrink-0 items-center pl-2 pr-3 hover:bg-white/5"

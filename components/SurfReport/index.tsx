@@ -89,6 +89,7 @@ export default function SurfReport() {
               waveHeights={data.waveHeights}
               onClickDropdown={() => setIsDropdownOpen(!isDropdownOpen)}
               audioFile={data.audioPath}
+              surfReportId={data.id}
             />
           </motion.div>
         )}

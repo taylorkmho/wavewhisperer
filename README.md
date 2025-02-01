@@ -84,6 +84,43 @@ CREATE TABLE surf_reports (
     audio_path TEXT
 );
 
+-- Create the votes table with IP tracking
+CREATE TABLE votes (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    surf_report_id UUID REFERENCES surf_reports(id) NOT NULL,
+    vote_type TEXT NOT NULL CHECK (vote_type IN ('up', 'down')),
+    ip_address TEXT NOT NULL
+);
+
+-- Add constraint to ensure one vote per IP per report
+ALTER TABLE votes
+ADD CONSTRAINT unique_vote_per_ip_per_report
+UNIQUE (surf_report_id, ip_address);
+
+-- Create function to get client IP
+CREATE OR REPLACE FUNCTION get_client_ip()
+RETURNS text
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    headers json;
+BEGIN
+    headers := current_setting('request.headers', true)::json;
+
+    IF headers->>'cf-connecting-ip' IS NOT NULL THEN
+        RETURN headers->>'cf-connecting-ip';
+    ELSIF headers->>'x-real-ip' IS NOT NULL THEN
+        RETURN headers->>'x-real-ip';
+    ELSIF headers->>'x-forwarded-for' IS NOT NULL THEN
+        RETURN headers->>'x-forwarded-for';
+    ELSE
+        RETURN NULL;
+    END IF;
+END;
+$$;
+
 -- Create storage bucket for audio files
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('voiceover', 'voiceover', true);
